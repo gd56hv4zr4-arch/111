@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { prisma } from '@/lib/prisma';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -50,7 +51,7 @@ function formatDate(date: Date) {
   }).format(date);
 }
 
-export default async function TicketsPage({
+async function TicketsPageContent({
   searchParams,
 }: {
   searchParams?: Promise<{
@@ -110,7 +111,9 @@ export default async function TicketsPage({
             <CardDescription>按分类、状态和优先级快速定位目标工单</CardDescription>
           </CardHeader>
           <CardContent>
-            <TicketsFilterBar categories={categoryOptions} />
+            <Suspense fallback={<div className="h-24 animate-pulse rounded-xl bg-slate-100" />}>
+              <TicketsFilterBar categories={categoryOptions} />
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -161,5 +164,21 @@ export default async function TicketsPage({
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function TicketsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    category?: string;
+    status?: string;
+    priority?: string;
+  }>;
+}) {
+  return (
+    <Suspense fallback={<div className="px-4 py-12 text-center text-sm text-slate-500">正在加载工单数据...</div>}>
+      <TicketsPageContent searchParams={searchParams} />
+    </Suspense>
   );
 }

@@ -4,6 +4,10 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.activityLog.deleteMany();
+  await prisma.ticket.deleteMany();
+  await prisma.agent.deleteMany();
+
   const agents = await prisma.$transaction([
     prisma.agent.create({ data: { name: '张伟', email: 'zhangwei@company.com', skills: JSON.stringify(['frontend', 'backend', 'payment']), capacity: 8, currentLoad: 3, performance: 92 } }),
     prisma.agent.create({ data: { name: '李娜', email: 'lina@company.com', skills: JSON.stringify(['customer_service', 'refund', 'complaint']), capacity: 10, currentLoad: 5, performance: 88 } }),
