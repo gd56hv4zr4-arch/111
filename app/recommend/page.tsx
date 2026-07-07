@@ -41,17 +41,20 @@ export default function RecommendPage() {
   const [results, setResults] = useState<Recommendation[]>([]);
 
   const handleRecommend = () => {
+    const normalizedCategory: string = fallbackSelectValue(category, 'TECH_SUPPORT');
+    const normalizedPriority: string = fallbackSelectValue(priority, 'MEDIUM');
+
     const ticket: Ticket = {
       id: 'demo',
       title,
-      category,
-      priority,
+      category: normalizedCategory,
+      priority: normalizedPriority,
       requiredSkills:
-        category === 'TECH_SUPPORT'
+        normalizedCategory === 'TECH_SUPPORT'
           ? ['backend']
-          : category === 'COMPLAINT'
+          : normalizedCategory === 'COMPLAINT'
             ? ['customer_service']
-            : category === 'PRODUCT_FEEDBACK'
+            : normalizedCategory === 'PRODUCT_FEEDBACK'
               ? ['product']
               : [],
     };
