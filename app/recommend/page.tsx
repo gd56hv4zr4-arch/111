@@ -2,12 +2,30 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { recommendAssignee, Recommendation, Agent, Ticket } from '@/lib/recommender';
+
+const categoryOptions = [
+  { value: 'TECH_SUPPORT', label: '技术支持' },
+  { value: 'COMPLAINT', label: '投诉' },
+  { value: 'PRODUCT_FEEDBACK', label: '产品反馈' },
+  { value: 'INQUIRY', label: '咨询' },
+] as const;
+
+const priorityOptions = [
+  { value: 'URGENT', label: '紧急' },
+  { value: 'HIGH', label: '高' },
+  { value: 'MEDIUM', label: '中' },
+  { value: 'LOW', label: '低' },
+] as const;
+
+function fallbackSelectValue(value: string | null, fallback: string) {
+  return value ?? fallback;
+}
 
 const mockAgents: Agent[] = [
   { id: '1', name: '张伟', skills: ['frontend', 'backend', 'payment'], capacity: 8, currentLoad: 3, performance: 92 },
@@ -18,14 +36,24 @@ const mockAgents: Agent[] = [
 
 export default function RecommendPage() {
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('TECH_SUPPORT');
-  const [priority, setPriority] = useState('MEDIUM');
+  const [category, setCategory] = useState<string | null>('TECH_SUPPORT');
+  const [priority, setPriority] = useState<string | null>('MEDIUM');
   const [results, setResults] = useState<Recommendation[]>([]);
 
   const handleRecommend = () => {
     const ticket: Ticket = {
-      id: 'demo', title, category, priority,
-      requiredSkills: category === 'TECH_SUPPORT' ? ['backend'] : category === 'COMPLAINT' ? ['customer_service'] : category === 'PRODUCT_FEEDBACK' ? ['product'] : [],
+      id: 'demo',
+      title,
+      category,
+      priority,
+      requiredSkills:
+        category === 'TECH_SUPPORT'
+          ? ['backend']
+          : category === 'COMPLAINT'
+            ? ['customer_service']
+            : category === 'PRODUCT_FEEDBACK'
+              ? ['product']
+              : [],
     };
     setResults(recommendAssignee(ticket, mockAgents));
   };
@@ -45,25 +73,37 @@ export default function RecommendPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">分类</label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={fallbackSelectValue(category, 'TECH_SUPPORT')}
+                  onValueChange={(value) => setCategory(fallbackSelectValue(value, 'TECH_SUPPORT'))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="TECH_SUPPORT">技术支持</SelectItem>
-                    <SelectItem value="COMPLAINT">投诉</SelectItem>
-                    <SelectItem value="PRODUCT_FEEDBACK">产品反馈</SelectItem>
-                    <SelectItem value="INQUIRY">咨询</SelectItem>
+                    {categoryOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">优先级</label>
-                <Select value={priority} onValueChange={setPriority}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={fallbackSelectValue(priority, 'MEDIUM')}
+                  onValueChange={(value) => setPriority(fallbackSelectValue(value, 'MEDIUM'))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="URGENT">紧急</SelectItem>
-                    <SelectItem value="HIGH">高</SelectItem>
-                    <SelectItem value="MEDIUM">中</SelectItem>
-                    <SelectItem value="LOW">低</SelectItem>
+                    {priorityOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

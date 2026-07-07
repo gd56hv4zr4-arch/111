@@ -23,10 +23,10 @@ export function TicketsFilterBar({ categories }: { categories: string[] }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const updateParams = (key: string, value: string) => {
+  const updateParams = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (value === 'all') {
+    if (value === 'all' || value === null) {
       params.delete(key);
     } else {
       params.set(key, value);

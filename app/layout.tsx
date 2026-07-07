@@ -2,12 +2,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
-import { Geist } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'Ticket Intelligence - 智能工单系统',
@@ -24,7 +21,7 @@ const navItems = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN" className={cn('font-sans', geist.variable)}>
+    <html lang="zh-CN">
       <body className="antialiased bg-slate-50 text-slate-900">
         <div className="min-h-screen">
           <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
