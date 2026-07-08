@@ -124,43 +124,73 @@ async function TicketsPageContent({
             <CardDescription>共 {tickets.length} 条记录</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>标题</TableHead>
-                  <TableHead>分类</TableHead>
-                  <TableHead>优先级</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>处理人</TableHead>
-                  <TableHead>创建时间</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tickets.map((ticket) => (
-                  <TableRow key={ticket.id}>
-                    <TableCell className="max-w-[320px] truncate font-medium text-slate-900">
-                      {ticket.title}
-                    </TableCell>
-                    <TableCell>{ticket.category}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className={cn('border-transparent capitalize', priorityStyles[ticket.priority] ?? priorityStyles.low)}
-                      >
-                        {priorityLabels[ticket.priority] ?? ticket.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="border-slate-200 text-slate-600">
-                        {statusLabels[ticket.status] ?? ticket.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{ticket.assignee?.name ?? '未分配'}</TableCell>
-                    <TableCell>{formatDate(ticket.createdAt)}</TableCell>
+            {tickets.length === 0 ? (
+              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
+                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-2xl">
+                  🎫
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">暂无工单数据</h3>
+                <p className="mt-2 max-w-md text-sm text-slate-500">
+                  当前数据库里还没有工单。你可以先创建第一条工单，系统会自动帮你分类和保存。
+                </p>
+                <div className="mt-6 flex items-center gap-3">
+                  <a
+                    href="/tickets/new"
+                    className={cn(
+                      'inline-flex h-10 items-center justify-center rounded-md bg-indigo-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700'
+                    )}
+                  >
+                    创建工单
+                  </a>
+                  <a
+                    href="/classify"
+                    className={cn(
+                      'inline-flex h-10 items-center justify-center rounded-md border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50'
+                    )}
+                  >
+                    先体验分类
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>标题</TableHead>
+                    <TableHead>分类</TableHead>
+                    <TableHead>优先级</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead>处理人</TableHead>
+                    <TableHead>创建时间</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {tickets.map((ticket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell className="max-w-[320px] truncate font-medium text-slate-900">
+                        {ticket.title}
+                      </TableCell>
+                      <TableCell>{ticket.category}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className={cn('border-transparent capitalize', priorityStyles[ticket.priority] ?? priorityStyles.low)}
+                        >
+                          {priorityLabels[ticket.priority] ?? ticket.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="border-slate-200 text-slate-600">
+                          {statusLabels[ticket.status] ?? ticket.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{ticket.assignee?.name ?? '未分配'}</TableCell>
+                      <TableCell>{formatDate(ticket.createdAt)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
