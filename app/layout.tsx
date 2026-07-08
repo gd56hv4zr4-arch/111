@@ -4,7 +4,8 @@ import Link from 'next/link';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { AppSessionProvider } from '@/components/session-provider';
+import { AuthButtons } from '@/components/auth-buttons';
 
 export const metadata: Metadata = {
   title: 'Ticket Intelligence - 智能工单系统',
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-CN">
       <body className="antialiased bg-slate-50 text-slate-900">
+        <AppSessionProvider>
         <div className="min-h-screen">
           <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
             <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
@@ -49,15 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </nav>
 
               <div className="ml-auto flex items-center gap-3">
-                <Card className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-600 shadow-none">
-                  U
-                </Card>
+                <AuthButtons />
               </div>
             </div>
           </header>
 
           <main>{children}</main>
         </div>
+        </AppSessionProvider>
       </body>
     </html>
   );
