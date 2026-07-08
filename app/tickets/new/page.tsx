@@ -32,7 +32,7 @@ async function createTicketAction(
       select: { id: true },
     });
 
-    redirect(`/tickets/${ticket.id}`);
+    redirect('/tickets');
   } catch (error) {
     console.error('Failed to create ticket', error);
     return { error: '创建工单失败，请稍后重试。' };
