@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+import { prisma, getPrismaErrorMessage } from '@/lib/prisma';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -65,37 +66,37 @@ async function TicketsPageContent({
   const status = params.status;
   const priority = params.priority;
 
-  const [tickets, categories] = await Promise.all([
-    prisma.ticket.findMany({
-      where: {
-        ...(category ? { category } : {}),
-        ...(status ? { status } : {}),
-        ...(priority ? { priority } : {}),
-      },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        assignee: {
-          select: {
-            name: true,
+  try {
+    const [tickets, categories] = await Promise.all([
+      prisma.ticket.findMany({
+        where: {
+          ...(category ? { category } : {}),
+          ...(status ? { status } : {}),
+          ...(priority ? { priority } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          assignee: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
-    }),
-    prisma.ticket.findMany({
-      distinct: ['category'],
-      select: {
-        category: true,
-      },
-      orderBy: {
-        category: 'asc',
-      },
-    }),
-  ]);
+      }),
+      prisma.ticket.findMany({
+        distinct: ['category'],
+        select: {
+          category: true,
+        },
+        orderBy: {
+          category: 'asc',
+        },
+      }),
+    ]);
 
-  const categoryOptions = categories.map((item) => item.category);
+    const categoryOptions = categories.map((item) => item.category);
 
-  return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    return (
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">工单管理</h1>
@@ -163,8 +164,28 @@ async function TicketsPageContent({
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Failed to render tickets page', error);
+
+    const message =
+      error instanceof Prisma.PrismaClientInitializationError
+        ? getPrismaErrorMessage(error, '数据库暂时不可用，请稍后重试。')
+        : '工单数据暂时无法加载，请稍后重试。';
+
+    return (
+      <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <Card className="border-amber-200 bg-amber-50/80 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-amber-900">工单数据暂时不可用</CardTitle>
+              <CardDescription className="text-amber-800">{message}</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default function TicketsPage({

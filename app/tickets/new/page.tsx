@@ -1,7 +1,12 @@
-import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+import { prisma, getPrismaErrorMessage } from '@/lib/prisma';
 import { classifyTicket, type ClassificationResult } from '@/lib/classifier';
 import { NewTicketForm, type NewTicketActionState } from '@/components/new-ticket-form';
 import { redirect } from 'next/navigation';
+
+function isPrismaConnectionError(error: unknown) {
+  return error instanceof Prisma.PrismaClientInitializationError;
+}
 
 async function createTicketAction(
   _state: NewTicketActionState,
@@ -35,6 +40,11 @@ async function createTicketAction(
     redirect('/tickets');
   } catch (error) {
     console.error('Failed to create ticket', error);
+
+    if (isPrismaConnectionError(error)) {
+      return { error: getPrismaErrorMessage(error, '数据库连接失败，暂时无法创建工单。') };
+    }
+
     return { error: '创建工单失败，请稍后重试。' };
   }
 }

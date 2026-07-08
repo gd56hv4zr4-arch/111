@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+import { prisma, getPrismaErrorMessage } from '@/lib/prisma';
+
+function isPrismaConnectionError(error: unknown) {
+  return error instanceof Prisma.PrismaClientInitializationError;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,6 +32,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ tickets });
   } catch (error) {
     console.error('Failed to fetch tickets', error);
+
+    if (isPrismaConnectionError(error)) {
+      return NextResponse.json(
+        {
+          tickets: [],
+          warning: getPrismaErrorMessage(error, '数据库暂时不可用，已返回空列表。'),
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { message: 'Failed to fetch tickets' },
       { status: 500 }
