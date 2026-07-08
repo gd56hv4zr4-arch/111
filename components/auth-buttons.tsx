@@ -1,8 +1,6 @@
 'use client';
 
 import { signIn, signOut, useSession } from 'next-auth/react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export function AuthButtons() {
   const { data: session, status } = useSession();
@@ -13,9 +11,12 @@ export function AuthButtons() {
 
   if (!session) {
     return (
-      <Button onClick={() => signIn('github')} className="bg-indigo-600 hover:bg-indigo-700">
+      <button
+        onClick={() => signIn('github')}
+        className="inline-flex h-10 items-center justify-center rounded-md bg-indigo-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+      >
         GitHub 登录
-      </Button>
+      </button>
     );
   }
 
@@ -24,18 +25,18 @@ export function AuthButtons() {
 
   return (
     <div className="flex items-center gap-3">
-      <Link href="/tickets" className="hidden text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
-        工单管理
-      </Link>
       <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-sm">
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
           {fallback}
         </div>
         <span className="max-w-24 truncate text-sm font-medium text-slate-700">{name}</span>
       </div>
-      <Button variant="outline" onClick={() => signOut({ callbackUrl: '/' })}>
+      <button
+        onClick={() => signOut({ callbackUrl: '/' })}
+        className="inline-flex h-10 items-center justify-center rounded-md border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+      >
         登出
-      </Button>
+      </button>
     </div>
   );
 }
