@@ -6,6 +6,10 @@ function isPrismaConnectionError(error: unknown) {
   return error instanceof Prisma.PrismaClientInitializationError;
 }
 
+function isPrismaTableMissingError(error: unknown) {
+  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
@@ -33,11 +37,14 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Failed to fetch tickets', error);
 
-    if (isPrismaConnectionError(error)) {
+    if (isPrismaConnectionError(error) || isPrismaTableMissingError(error)) {
       return NextResponse.json(
         {
           tickets: [],
-          warning: getPrismaErrorMessage(error, '数据库暂时不可用，已返回空列表。'),
+          warning:
+            error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021'
+              ? '数据库表结构尚未初始化，已返回空列表。'
+              : getPrismaErrorMessage(error, '数据库暂时不可用，已返回空列表。'),
         },
         { status: 503 }
       );
